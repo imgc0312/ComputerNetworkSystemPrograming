@@ -14,6 +14,12 @@ static clock_t start_time;
 void set_timer(void) {
 	struct tms tmbuf;
 	/* Fill in code. */
+
+	if((start_time = times(&tmbuf)) == -1){
+		perror("times");
+		exit(1);
+	}
+	tms_o = tmbuf;
 }
 
 
@@ -28,5 +34,15 @@ void stop_timer(void) {
 	/* Get delta times and print them out.
 	 *
 	 * Fill in code. */
+	if((end_time = times(&tmbuf)) == -1){
+		printf("end error\n");
+		perror("times");
+		exit(1);
+	}
+	printf("Sys: %f \t",(( tmbuf.tms_stime - tms_o.tms_stime ) / ticks ));
+	printf("User: %f \t",(( tmbuf.tms_utime - tms_o.tms_utime ) / ticks ));
+	printf("Real: %f \n",( end_time - start_time ) / ticks );
+	
+	
 }
 

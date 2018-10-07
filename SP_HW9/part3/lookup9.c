@@ -21,13 +21,38 @@ int lookup(Dictrec * sought, const char * resource) {
 
 		/* Set up destination address.
 		 * Fill in code. */
+		server.sin_family = AF_INET;
+		server.sin_port = htons(PORT);
+		if((host = gethostbyname(resource)) == NULL){
+			perror("gethostbyname");
+			return UNAVAIL;
+		}
+		memcpy((char *)&server.sin_addr, host->h_addr, host->h_length);
 
 		/* Allocate a socket.
 		 * Fill in code. */
+		if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1){
+			perror("socket");
+			return UNAVAIL;
+		}
+
+
 	}
 
 	/* Send a datagram & await reply
 	 * Fill in code. */
+	int addr_size = sizeof(struct sockaddr_in);
+	if(sendto(sockfd, sought, sizeof(*sought), 0, (struct sockaddr*)&server, addr_size) == -1){
+		perror("sendto");
+		return UNAVAIL;
+	}
+	if(recvfrom(sockfd, sought, sizeof(*sought), 0, (struct sockaddr*) &server, &addr_size) == -1){
+		perror("recvfrom");
+		return UNAVAIL;
+	}
+
+
+
 
 	if (strcmp(sought->text,"XXXX") != 0) {
 		return FOUND;

@@ -24,12 +24,25 @@ int main(int argc, char **argv) {
 
 	/* Create a UDP socket.
 	 * Fill in code. */
+	if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1){
+		DIE("socket");
+	}
+
+
 
 	/* Initialize address.
 	 * Fill in code. */
+	server.sin_family = AF_INET;
+	server.sin_port = htons(PORT);
+	server.sin_addr.s_addr = htonl(INADDR_ANY);//any eth
 
 	/* Name and activate the socket.
 	 * Fill in code. */
+	if(bind(sockfd, (struct sockaddr*)&server, sizeof(server)) == -1){
+		//name
+		DIE("bind");
+	}
+	/* udp not need listen()*/
 
 	for (;;) { /* await client packet; respond immediately */
 
@@ -38,16 +51,28 @@ int main(int argc, char **argv) {
 		/* Wait for a request.
 		 * Fill in code. */
 
-		while (___) {
+		while (recvfrom(sockfd, tryit, sizeof(*tryit), 0, (struct sockaddr*) &client, &siz) != -1) {
 			/* Lookup request and respond to user. */
 			switch(lookup(tryit,argv[1]) ) {
 				case FOUND: 
 					/* Send response.
 					 * Fill in code. */
+					if(sendto(sockfd, tryit, sizeof(*tryit), 0, (struct sockaddr *) &client, siz) == -1){
+						DIE("sendto");
+					}
+					
+
 					break;
 				case NOTFOUND : 
 					/* Send response.
 					 * Fill in code. */
+					strcpy(tryit->text, "XXXX");
+					if(sendto(sockfd, tryit, sizeof(*tryit), 0, (struct sockaddr *) &client, siz) == -1){
+						DIE("sendto");
+					}
+
+
+
 					break;
 				case UNAVAIL:
 					DIE(argv[1]);
